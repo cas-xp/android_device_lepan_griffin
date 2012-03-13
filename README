@@ -1,0 +1,7 @@
+This is for LePan TC970(OMAP3 1GB RAM, 1GHz CPU, 1024x768, 5 points touchscreen, 2GB EMMC, 512MB Nand)
+on CM9, now 
+1) Graphic acceleration can not enable
+2) Touch screen is not functional at all
+
+Please follow this link to make ICS CM9 working...
+http://code.google.com/p/rowboat/wiki/ICSonBeagleboard
