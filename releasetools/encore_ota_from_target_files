@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #
 # Copyright (C) 2008 The Android Open Source Project
-# Copyright (C) 2011 The CyanogenMod Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -78,15 +77,11 @@ def WriteFullOTAPackage(input_zip, output_zip):
 
   script.FormatPartition("/system")
   script.Mount("/system")
-  #script.UnpackPackageDir("recovery", "/system")
+  script.UnpackPackageDir("recovery", "/system")
   script.UnpackPackageDir("system", "/system")
 
-  (symlinks, retouch_files) = CopySystemFiles(input_zip, output_zip)
+  symlinks = CopySystemFiles(input_zip, output_zip)
   script.MakeSymlinks(symlinks)
-  if OPTIONS.aslr_mode:
-    script.RetouchBinaries(retouch_files)
-  else:
-    script.UndoRetouchBinaries(retouch_files)
 
   # -- encore build change starting
   #boot_img = common.File("boot.img", common.BuildBootableImage(
@@ -108,6 +103,8 @@ def WriteFullOTAPackage(input_zip, output_zip):
   if OPTIONS.backuptool:
     script.ShowProgress(0.2, 10)
     script.RunBackup("restore")
+
+  script.RunVerifyCachePartitionSize()
 
   script.ShowProgress(0.2, 10)
   # -- encore build change starting
@@ -136,13 +133,12 @@ ota_from_target_files.WriteFullOTAPackage = WriteFullOTAPackage
 
 
 def WriteIncrementalOTAPackage(target_zip, source_zip, output_zip):
-    print "Incremental OTA Packages are not support on the B&N Encore at this time"
+    print "Incremental OTA Packages are not support on the B&N encore at this time"
     sys.exit(1)
 ota_from_target_files.WriteIncrementalOTAPackage = WriteIncrementalOTAPackage
 
 if __name__ == '__main__':
   try:
-    common.CloseInheritedPipes()
     main(sys.argv[1:])
   except common.ExternalError, e:
     print
