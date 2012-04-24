@@ -1,0 +1,248 @@
+diff --git a/core/jni/android_hardware_Camera.cpp b/core/jni/android_hardware_Camera.cpp
+index c4ee2f1..4b2d948 100644
+--- a/core/jni/android_hardware_Camera.cpp
++++ b/core/jni/android_hardware_Camera.cpp
+@@ -584,9 +584,9 @@ static void android_hardware_Camera_stopSmoothZoom(JNIEnv *env, jobject thiz)
+ static void android_hardware_Camera_setDisplayOrientation(JNIEnv *env, jobject thiz,
+         jint value)
+ {
+-    LOGV("setDisplayOrientation");
++    LOGE("setDisplayOrientation");
+     sp<Camera> camera = get_native_camera(env, thiz, NULL);
+-    if (camera == 0) return;
++    if (camera == 0) {LOGE("camera is null");return;}
+ 
+     if (camera->sendCommand(CAMERA_CMD_SET_DISPLAY_ORIENTATION, value, 0) != NO_ERROR) {
+         jniThrowException(env, "java/lang/RuntimeException", "set display orientation failed");
+diff --git a/include/camera/CameraParameters.h b/include/camera/CameraParameters.h
+old mode 100644
+new mode 100755
+index 5391426..b9e085d
+--- a/include/camera/CameraParameters.h
++++ b/include/camera/CameraParameters.h
+@@ -162,6 +162,7 @@ public:
+     // in EXIF.
+     // Example value: "512x384,320x240,0x0". Read only.
+     static const char KEY_SUPPORTED_JPEG_THUMBNAIL_SIZES[];
++    static const char KEY_SUPPORT_DIFF_AUTOFOCUS_POSITION[];
+     // The quality of the EXIF thumbnail in Jpeg picture. The range is 1 to 100,
+     // with 100 being the best.
+     // Example value: "90". Read/write.
+@@ -376,7 +377,7 @@ public:
+     static const char KEY_SUPPORTED_FACE_DETECTION[];
+ 
+     //Continuous AF.
+-    static const char KEY_SELECTABLE_ZONE_AF[];
++    static const char KEY_AUTOFOCUS_POSITION[];
+     static const char KEY_SUPPORTED_SELECTABLE_ZONE_AF[];
+ 
+     static const char KEY_SHUTTER_SOUND[];
+@@ -529,7 +530,7 @@ public:
+ 
+     // Values for Continuous AF
+     static const char CAF_OFF[] ;
+-    static const char CAF_ON[] ;
++    static const char KEY_EV[] ;
+     // Proprietaries from CodeAurora use these...
+     static const char CONTINUOUS_AF_OFF[] ;
+     static const char CONTINUOUS_AF_ON[] ;
+diff --git a/libs/camera/CameraParameters.cpp b/libs/camera/CameraParameters.cpp
+old mode 100644
+new mode 100755
+index 703f2a9..5280360
+--- a/libs/camera/CameraParameters.cpp
++++ b/libs/camera/CameraParameters.cpp
+@@ -43,6 +43,7 @@ const char CameraParameters::KEY_SUPPORTED_PICTURE_FORMATS[] = "picture-format-v
+ const char CameraParameters::KEY_JPEG_THUMBNAIL_WIDTH[] = "jpeg-thumbnail-width";
+ const char CameraParameters::KEY_JPEG_THUMBNAIL_HEIGHT[] = "jpeg-thumbnail-height";
+ const char CameraParameters::KEY_SUPPORTED_JPEG_THUMBNAIL_SIZES[] = "jpeg-thumbnail-size-values";
++const char CameraParameters::KEY_SUPPORT_DIFF_AUTOFOCUS_POSITION[] = "jpeg-support-diff-autofocus-values";
+ const char CameraParameters::KEY_JPEG_THUMBNAIL_QUALITY[] = "jpeg-thumbnail-quality";
+ const char CameraParameters::KEY_JPEG_QUALITY[] = "jpeg-quality";
+ const char CameraParameters::KEY_ROTATION[] = "rotation";
+@@ -199,7 +200,7 @@ const char CameraParameters::KEY_SUPPORTED_FACE_DETECTION[] = "face-detection-va
+ const char CameraParameters::KEY_SCENE_DETECT[] = "scene-detect";
+ const char CameraParameters::KEY_SUPPORTED_SCENE_DETECT[] = "scene-detect-values";
+ 
+-const char CameraParameters::KEY_SELECTABLE_ZONE_AF[] = "selectable-zone-af";
++const char CameraParameters::KEY_AUTOFOCUS_POSITION[] = "selectable-zone-af";
+ const char CameraParameters::KEY_SUPPORTED_SELECTABLE_ZONE_AF[] = "selectable-zone-af-values";
+ const char CameraParameters::KEY_SHUTTER_SOUND[] = "shutter-sound";
+ const char CameraParameters::KEY_BRIGHTNESS_MODE[] = "brightness-mode";
+@@ -250,7 +251,7 @@ const char CameraParameters::LENSSHADE_DISABLE[] = "disable";
+ 
+ //Values for Continuous AF
+ const char CameraParameters::CAF_OFF[] = "caf-off";
+-const char CameraParameters::CAF_ON[] = "caf-on";
++const char CameraParameters::KEY_EV[] = "caf-on";
+ //Same, for CodeAurora-based blobs
+ const char CameraParameters::CONTINUOUS_AF_OFF[] = "caf-off";
+ const char CameraParameters::CONTINUOUS_AF_ON[] = "caf-on";
+diff --git a/media/libstagefright/Android.mk b/media/libstagefright/Android.mk
+old mode 100644
+new mode 100755
+index e1ef766..a1dfcfa
+--- a/media/libstagefright/Android.mk
++++ b/media/libstagefright/Android.mk
+@@ -152,9 +152,9 @@ ifeq ($(TARGET_DONT_SET_AUDIO_AAC_FORMAT),true)
+         LOCAL_CFLAGS += -DDONT_SET_AUDIO_AAC_FORMAT
+ endif
+ 
+-ifeq ($(TARGET_USE_OMAP_COMPAT),true)
++#ifeq ($(TARGET_USE_OMAP_COMPAT),true)
+         LOCAL_CFLAGS += -DOMAP_COMPAT
+-endif
++#endif
+ 
+ ifeq ($(TARGET_OS)-$(TARGET_SIMULATOR),linux-true)
+         LOCAL_LDLIBS += -lpthread
+diff --git a/media/libstagefright/OMXCodec.cpp b/media/libstagefright/OMXCodec.cpp
+old mode 100644
+new mode 100755
+index 2994e5c..0954432
+--- a/media/libstagefright/OMXCodec.cpp
++++ b/media/libstagefright/OMXCodec.cpp
+@@ -234,7 +234,7 @@ static sp<MediaSource> InstantiateSoftwareCodec(
+ #undef FACTORY_REF
+ #undef FACTORY_CREATE
+ 
+-#if defined(OMAP_ENHANCEMENT) || defined(OMAP_COMPAT)
++#if defined(OMAP_ENHANCEMENT) || defined(OMAP_COMPAT) || defined(TARGET_OMAP3)
+ #ifdef TARGET_OMAP4
+ //Enable Ducati Codecs for Video, PV SW codecs for Audio
+ static const CodecInfo kDecoderInfo[] = {
+@@ -266,7 +266,7 @@ static const CodecInfo kEncoderInfo[] = {
+     { MEDIA_MIMETYPE_VIDEO_H263, "OMX.TI.DUCATI1.VIDEO.MPEG4E" },
+     { MEDIA_MIMETYPE_VIDEO_AVC, "OMX.TI.DUCATI1.VIDEO.H264E" },
+ };
+-#elif defined(TARGET_OMAP3)
++#else //if defined(TARGET_OMAP3)
+ static const CodecInfo kDecoderInfo[] = {
+     { MEDIA_MIMETYPE_IMAGE_JPEG, "OMX.TI.JPEG.decoder" },
+     { MEDIA_MIMETYPE_AUDIO_MPEG, "OMX.TI.MP3.decode" },
+@@ -308,6 +308,8 @@ static const CodecInfo kEncoderInfo[] = {
+ };
+ #endif
+ #else
++#error "2here!!"
++
+ static const CodecInfo kDecoderInfo[] = {
+     { MEDIA_MIMETYPE_IMAGE_JPEG, "OMX.TI.JPEG.decoder" },
+     { MEDIA_MIMETYPE_AUDIO_MPEG, "OMX.Nvidia.mp3.decoder" },
+@@ -630,7 +632,7 @@ uint32_t OMXCodec::getComponentQuirks(const char *componentName, bool isEncoder)
+         quirks |= kDefersOutputBufferAllocation;
+         quirks |= kDoesNotRequireMemcpyOnOutputPort;
+     }
+-#if defined(OMAP_ENHANCEMENT) || defined(OMAP_COMPAT)
++#if defined(OMAP_ENHANCEMENT) || defined(OMAP_COMPAT) ||defined(TARGET_OMAP3)
+     if (!strcmp(componentName, "OMX.TI.Video.Decoder") ||
+             !strcmp(componentName, "OMX.TI.720P.Decoder")) {
+         // TI Video Decoder and TI 720p Decoder must use buffers allocated
+@@ -1590,19 +1592,20 @@ static size_t getFrameSize(
+ 
+ status_t OMXCodec::findTargetColorFormat(
+         const sp<MetaData>& meta, OMX_COLOR_FORMATTYPE *colorFormat) {
+-    LOGV("findTargetColorFormat");
++    LOGI("findTargetColorFormat, mComponentName=%s",mComponentName);
+     CHECK(mIsEncoder);
+ 
+     *colorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
+     int32_t targetColorFormat;
+     if (meta->findInt32(kKeyColorFormat, &targetColorFormat)) {
+         *colorFormat = (OMX_COLOR_FORMATTYPE) targetColorFormat;
+-    } else {
++		//LOGI("findTargetColorFormat with colorFormat=%d", *colorFormat);
++    } //else {
+         if (!strcasecmp("OMX.TI.Video.encoder", mComponentName) ||
+             !strcasecmp("OMX.TI.720P.Encoder", mComponentName)) {
+             *colorFormat = OMX_COLOR_FormatYCbYCr;
+         }
+-    }
++    //}
+ 
+     // Check whether the target color format is supported.
+     return isColorFormatSupported(*colorFormat, kPortIndexInput);
+diff --git a/services/camera/libcameraservice/CameraService.cpp b/services/camera/libcameraservice/CameraService.cpp
+old mode 100644
+new mode 100755
+index a575451..f6d830c
+--- a/services/camera/libcameraservice/CameraService.cpp
++++ b/services/camera/libcameraservice/CameraService.cpp
+@@ -760,8 +760,8 @@ status_t CameraService::Client::setOverlay() {
+ #else
+     params.getPreviewSize(&w, &h);
+ #endif
+-
+-#ifdef BOARD_USE_FROYO_LIBCAMERA
++#if 0
++#ifdef BOARD_USE_FROYO_LIBCAMERA 
+     //for 720p recording , preview can be 800X448
+     if(w == preview_sizes[0].width && h==preview_sizes[0].height){
+         LOGD("Changing overlay dimensions to 768X432 for 720p recording.");
+@@ -769,7 +769,7 @@ status_t CameraService::Client::setOverlay() {
+         h = preview_sizes[1].height;
+     }
+ #endif
+-
++#endif
+ #ifdef OMAP_ENHANCEMENT
+ 
+     ///Query the current preview pixel format from Camera HAL to create the overlay
+@@ -1275,7 +1275,9 @@ status_t CameraService::Client::sendCommand(int32_t cmd, int32_t arg1, int32_t a
+         case CAMERA_CMD_SET_DISPLAY_ORIENTATION:
+             // The orientation cannot be set during preview.
+             if (mHardware->previewEnabled()) {
+-                return INVALID_OPERATION;
++	    		LOGE("CAMERA_CMD_SET_DISPLAY_ORIENTATION with preview enabled!!!");
++			
++                return OK;
+             }
+             // Mirror the preview if the camera is front-facing.
+             orientation = getOrientation(arg1, mCameraFacing == CAMERA_FACING_FRONT);
+@@ -1283,6 +1285,7 @@ status_t CameraService::Client::sendCommand(int32_t cmd, int32_t arg1, int32_t a
+ 
+             if (mOrientation != orientation) {
+                 mOrientation = orientation;
++				LOGE("mOrientation=%d",mOrientation);
+                 if (mOverlayRef != 0) mOrientationChanged = true;
+             }
+             return OK;
+diff --git a/services/java/com/android/server/InputManager.java b/services/java/com/android/server/InputManager.java
+old mode 100644
+new mode 100755
+index ba39c57..2559ac3
+--- a/services/java/com/android/server/InputManager.java
++++ b/services/java/com/android/server/InputManager.java
+@@ -80,6 +80,7 @@ public class InputManager {
+     private static native void nativeGetInputConfiguration(Configuration configuration);
+     private static native int[] nativeGetInputDeviceIds();
+     private static native String nativeDump();
++	private static int HWROTATION=0;
+     
+     // Input event injection constants defined in InputDispatcher.h.
+     static final int INPUT_EVENT_INJECTION_SUCCEEDED = 0;
+@@ -119,11 +120,13 @@ public class InputManager {
+     private void init() {
+         Slog.i(TAG, "Initializing input manager");
+         nativeInit(mCallbacks);
++		HWROTATION = SystemProperties.getInt("ro.sf.hwrotation", 0)/90;
+     }
+     
+     public void start() {
+         Slog.i(TAG, "Starting input manager");
+         nativeStart();
++		setDisplayOrientation(0,0);
+     }
+     
+     public void setDisplaySize(int displayId, int width, int height) {
+@@ -144,8 +147,8 @@ public class InputManager {
+         
+         if (DEBUG) {
+             Slog.d(TAG, "Setting display #" + displayId + " orientation to " + rotation);
+-        }
+-        nativeSetDisplayOrientation(displayId, rotation);
++        }//(rotation+HWROTATION) % 4
++        nativeSetDisplayOrientation(displayId, (rotation+HWROTATION) % 4);
+     }
+     
+     public void getInputConfiguration(Configuration config) {

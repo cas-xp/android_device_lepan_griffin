@@ -29,10 +29,6 @@ if [ ! -f "$1" ]; then
 fi
 rm -rf ../../../vendor/$MANUFACTURER/$DEVICE
 mkdir -p ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/bin
-mkdir -p ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/etc/firmware
-mkdir -p ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/etc/wifi
-mkdir -p ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/etc/wifi/softap
-mkdir -p ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/etc/cert
 mkdir -p ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/lib/egl
 mkdir -p ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/lib/hw
 
@@ -113,5 +109,5 @@ unzip -j -o $ZIPFILE system/lib/libOMX.ITTIAM.AAC.encode.so  -d ../../../vendor/
 unzip -j -o $ZIPFILE system/lib/libOMX.ITTIAM.AAC.decode.so  -d ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/lib/
 unzip -j -o $ZIPFILE system/lib/libOMX.TI.h264.splt.Encoder.so  -d ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/lib/
 
-echo "NOTE: Unless all transfers failed, errors above should be safe to ignore. Proceed with your build"
+./setup-makefiles.sh
 exit
