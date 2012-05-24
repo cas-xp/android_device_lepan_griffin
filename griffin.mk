@@ -21,9 +21,9 @@ include $(call all-named-subdir-makefiles, $(common_ti_dirs))
 
 $(call inherit-product, build/target/product/full_base.mk)
 
-# Place kernels to enable switching between 16 and 32 bit framebuffers
-# 16 bit can be use for a large increase in GFX performance
-# 32 bit is default
+# Place libcamera.so in obj folder for link and system/lib folder 
+# 
+# 
 PRODUCT_COPY_FILES += \
     device/lepan/griffin/prebuilt/libcamera.so:obj/lib/libcamera.so \
     device/lepan/griffin/prebuilt/libcamera.so:/system/lib/libcamera.so
@@ -52,7 +52,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/bluetooth/st_drv.ko:/system/etc/bluetooth/drivers/st_drv.ko \
     $(LOCAL_PATH)/prebuilt/bluetooth/fm_drv.ko:/system/etc/bluetooth/drivers/fm_drv.ko 
 
-# Place prebuilt from omapzoom
+# Place prebuilt from misc
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/asound.conf:/system/etc/asound.conf \
     $(LOCAL_PATH)/prebuilt/egl.cfg:/system/lib/egl/egl.cfg \
@@ -60,7 +60,13 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/orientationd:/system/bin/orientationd \
     $(LOCAL_PATH)/prebuilt/uim:/system/xbin/uim 
 
+# Place prebuilt from gps library in libhardware_legacy.so ==> libhardware_legaci.so 
+# To avoid name conflict
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/libhardware_legaci.so:/system/lib/libhardware_legaci.so 
+
 #    $(LOCAL_PATH)/prebuilt/libstagefrighthw.so:/system/lib/libstagefrighthw.so \
+#    $(LOCAL_PATH)/prebuilt/GFX/system/lib/hw/overlay.omap3.so:/system/lib/hw/overlay.omap3.so \
 
 # Place charger image and execute binary
 PRODUCT_COPY_FILES += \
@@ -72,7 +78,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/charger/images/charge_prepare.png:/system/usr/charger/images/charge_prepare.png \
     $(LOCAL_PATH)/prebuilt/charger/charger_man:/system/bin/charger_man 
 
-#    $(LOCAL_PATH)/prebuilt/GFX/system/lib/hw/overlay.omap3.so:/system/lib/hw/overlay.omap3.so \
 
 # Place permission files
 PRODUCT_COPY_FILES += \
@@ -96,6 +101,7 @@ PRODUCT_PACKAGES += \
     libskiahw \
     alsa.griffin \
     overlay.griffin \
+    gps.griffin \
     libbridge \
     cexec.out \
     libOMX_Core \

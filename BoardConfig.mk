@@ -107,3 +107,4 @@ endif
 
 BOARD_USES_UBOOT := true
 
+PRODUCT_SPECIFIC_DEFINES += TARGET_PRELINKER_MAP=\$(TOP)/device/lepan/griffin/prelink-linux-arm-griffin.map

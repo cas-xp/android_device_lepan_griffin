@@ -80,7 +80,7 @@ int init_nusensors(hw_module_t const* module, hw_device_t** device);
 // conversion of magnetic data to uT units
 #define CONVERT_M                   (1.0f/1000.0f)
 #define CONVERT_M_X                 (CONVERT_M)
-#define CONVERT_M_Y                 (CONVERT_M)
+#define CONVERT_M_Y                 (-CONVERT_M)
 #define CONVERT_M_Z                 (CONVERT_M)
 
 /* conversion of orientation data to degree units */

@@ -152,9 +152,9 @@ int CompassSensor::readEvents(sensors_event_t* data, int count)
         if (type == EV_ABS) {
             float value = event->value;
             if (event->code == EVENT_TYPE_MAGV_X) {
-                mPendingEvent.magnetic.x = value * CONVERT_M_X;
+                mPendingEvent.magnetic.y = value * CONVERT_M_X;
             } else if (event->code == EVENT_TYPE_MAGV_Y) {
-                mPendingEvent.magnetic.y = value * CONVERT_M_Y;
+                mPendingEvent.magnetic.x = value * CONVERT_M_Y;
             } else if (event->code == EVENT_TYPE_MAGV_Z) {
                 mPendingEvent.magnetic.z = value * CONVERT_M_Z;
             }
