@@ -80,6 +80,7 @@ unzip -j -o $ZIPFILE system/lib/dsp/wbamrenc_sn.dll64P -d ../../../vendor/$MANUF
 unzip -j -o $ZIPFILE system/lib/dsp/wmadec_sn.dll64P -d ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/lib/dsp/
 unzip -j -o $ZIPFILE system/lib/dsp/wmv9dec_sn.dll64P -d ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/lib/dsp/
 unzip -j -o $ZIPFILE system/lib/dsp/yuvconvert.l64p -d ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/lib/dsp/
+unzip -j -o $ZIPFILE system/bin/cexec.out -d ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/bin/
 # HAL
 unzip -j -o $ZIPFILE system/lib/hw/gralloc.omap3.so -d ../../../vendor/$MANUFACTURER/$DEVICE/proprietary/lib/hw
 

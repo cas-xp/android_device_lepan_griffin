@@ -137,7 +137,8 @@ PRODUCT_COPY_FILES += \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/dsp/wbamrenc_sn.dll64P:system/lib/dsp/wbamrenc_sn.dll64P \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/dsp/wmadec_sn.dll64P:system/lib/dsp/wmadec_sn.dll64P \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/dsp/wmv9dec_sn.dll64P:system/lib/dsp/wmv9dec_sn.dll64P \\
-    vendor/__VENDOR__/__DEVICE__/proprietary/lib/dsp/yuvconvert.l64p:system/lib/dsp/yuvconvert.l64p
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/dsp/yuvconvert.l64p:system/lib/dsp/yuvconvert.l64p \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/bin/cexec.out:system/bin/cexec.out 
 
 
 ## OMX 720p libraries

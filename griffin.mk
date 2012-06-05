@@ -103,7 +103,6 @@ PRODUCT_PACKAGES += \
     overlay.griffin \
     gps.griffin \
     libbridge \
-    cexec.out \
     libOMX_Core \
     libLCML \
     libOMX.TI.Video.Decoder \
