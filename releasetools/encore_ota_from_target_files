@@ -77,7 +77,7 @@ def WriteFullOTAPackage(input_zip, output_zip):
 
   script.FormatPartition("/system")
   script.Mount("/system")
-  script.UnpackPackageDir("recovery", "/system")
+  #script.UnpackPackageDir("recovery", "/system")
   script.UnpackPackageDir("system", "/system")
 
   symlinks = CopySystemFiles(input_zip, output_zip)
@@ -110,14 +110,14 @@ def WriteFullOTAPackage(input_zip, output_zip):
   # -- encore build change starting
   #script.WriteRawImage("/boot", "boot.img")
 
-  CopyBootFiles(input_zip, output_zip)
+  #CopyBootFiles(input_zip, output_zip)
 
   # This mimics how the official B&N updates work and seems pretty elegant to me
-  script.Mount("/boot")
-  script.UnpackPackageFile("MLO", "/boot/MLO")
-  script.UnpackPackageFile("u-boot.bin", "/boot/u-boot.bin")
-  script.UnpackPackageFile("kernel", "/boot/uImage")
-  script.UnpackPackageFile("ramdisk.img", "/boot/uRamdisk")
+  #script.Mount("/boot")
+  #script.UnpackPackageFile("MLO", "/boot/MLO")
+  #script.UnpackPackageFile("u-boot.bin", "/boot/u-boot.bin")
+  #script.UnpackPackageFile("kernel", "/boot/uImage")
+  #script.UnpackPackageFile("ramdisk.img", "/boot/uRamdisk")
   # -- encore build change done
 
   script.ShowProgress(0.1, 0)
