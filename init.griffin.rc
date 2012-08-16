@@ -18,7 +18,7 @@ loglevel 3
     export ANDROID_ROOT /system
     export ANDROID_ASSETS /system/app
     export ANDROID_DATA /data
-    export DOWNLOAD_CACHE /cache/download
+    export DOWNLOAD_CACHE /data/cache
     export EXTERNAL_STORAGE /mnt/sdcard
     export ASEC_MOUNTPOINT /mnt/asec
     export LOOP_MOUNTPOINT /mnt/obb
@@ -54,6 +54,7 @@ loglevel 3
     mkdir /data 0771 system system
     mkdir /cache 0771 system cache
     mkdir /config 0500 root root
+    mkdir /datadata 0771 system system
 
     # Directory for putting things only root should see.
     mkdir /mnt/secure 0700 root root
@@ -108,9 +109,10 @@ on fs
     mount yaffs2 mtd@system /system
     mount yaffs2 mtd@system /system ro remount
     mount ext4 /dev/block/mmcblk1p1 /data wait noatime nosuid nodev
-    mount yaffs2 mtd@userdata /cache nosuid nodev
+    mount yaffs2 mtd@userdata /datadata nosuid nodev
     #mount yaffs2 mtd@cache /cache nosuid nodev
     mount debugfs debugfs /sys/kernel/debug rw
+    symlink /datadata /data/data
 
 on post-fs
     # once everything is setup, no need to modify /
@@ -119,6 +121,8 @@ on post-fs
     # We chown/chmod /data again so because mount is run as root + defaults
     chown system system /data
     chmod 0771 /data
+    chown system system /datadata
+    chmod 0771 /datadata
 
     # Mount compressed filesystems
     mount squashfs loop@/system/lib/modules/modules.sqf /system/lib/modules ro
@@ -143,7 +147,13 @@ on post-fs
 
     write /proc/apanic_console 1
 
+    # download cache
+    mkdir /data/cache
+    chown system cache /data/cache
+    chmod 0770 /data/cache
+
     # Same reason as /data above
+    mount yaffs2 mtd@cache /cache nosuid nodev
     chown system cache /cache
     chmod 0771 /cache
 
@@ -381,7 +391,7 @@ on boot
 # the classes into the same memory level; the associated processes of higher
 # classes will still be killed first.
     write /sys/module/lowmemorykiller/parameters/adj 0,1,2,4,7,15
-
+#TODO: stock version has the following two lines comment out
     write /proc/sys/vm/overcommit_memory 1
     write /proc/sys/vm/min_free_order_shift 4
     write /sys/module/lowmemorykiller/parameters/minfree 2048,3072,4096,6144,7168,8192

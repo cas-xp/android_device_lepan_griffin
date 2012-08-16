@@ -78,6 +78,16 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/charger/images/charge_prepare.png:/system/usr/charger/images/charge_prepare.png \
     $(LOCAL_PATH)/prebuilt/charger/charger_man:/system/bin/charger_man 
 
+# Place key chars
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/keychars/griffin-i2c-touch.kcm.bin:/system/usr/keychars/griffin-i2c-touch.kcm.bin \
+    $(LOCAL_PATH)/keychars/headset-hook-button.kcm.bin:/system/usr/keychars/headset-hook-button.kcm.bin \
+    $(LOCAL_PATH)/keychars/twl4030_pwrbutton.kcm.bin:/system/usr/keychars/twl4030_pwrbutton.kcm.bin \
+    $(LOCAL_PATH)/keychars/twl4030-keypad.kcm.bin:/system/usr/keychars/twl4030-keypad.kcm.bin \
+    $(LOCAL_PATH)/keychars/griffin-i2c-touch.kl:/system/usr/keylayout/griffin-i2c-touch.kl \
+    $(LOCAL_PATH)/keychars/headset-hook-button.kl:/system/usr/keylayout/headset-hook-button.kl \
+    $(LOCAL_PATH)/keychars/twl4030_pwrbutton.kl:/system/usr/keylayout/twl4030_pwrbutton.kl \
+    $(LOCAL_PATH)/keychars/twl4030-keypad.kl:/system/usr/keylayout/twl4030-keypad.kl 
 
 # Place permission files
 PRODUCT_COPY_FILES += \

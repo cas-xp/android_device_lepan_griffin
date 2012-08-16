@@ -105,6 +105,7 @@ ifdef OMAP_ENHANCEMENT
 COMMON_GLOBAL_CFLAGS += -DOMAP_ENHANCEMENT -DTARGET_OMAP3
 endif
 
-BOARD_USES_UBOOT := true
-
+#to get standard ramdisk.img, disable BOARD_USES_UBOOT
+#BOARD_USES_UBOOT := true
+WITH_DEXPREOPT := true
 PRODUCT_SPECIFIC_DEFINES += TARGET_PRELINKER_MAP=\$(TOP)/device/lepan/griffin/prelink-linux-arm-griffin.map
