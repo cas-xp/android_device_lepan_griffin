@@ -1,13 +1,22 @@
 This is for LePan TC970(OMAP3 1GB RAM, 1GHz CPU, 1024x768, 5 points touchscreen, 2GB EMMC, 512MB Nand)
-on CM9, now 
-1) Graphic acceleration can not enable
-2) Touch screen is not functional at all
+on CM7
 
-Please follow this link to make ICS CM9 working...
-http://code.google.com/p/rowboat/wiki/ICSonBeagleboard
 
 Build procedure:
-1) ./extract-files.sh update-griffin.zip
+
+To get started with Android/CyanogenMod, you'll need to get
+familiar with [Git and Repo](http://source.android.com/download/using-repo).
+
+To initialize your local repository using the CyanogenMod trees, use a command like this:
+
+    repo init -u git://github.com/cas-xp/android.git -b gingerbread
+
+Then to sync up:
+
+    repo sync
+
+0) cd device/lepan/griffin
+1) ./extract-files.sh your_previous_update-griffin.zip
 2) cd ../../../
 3) . build/envsetup.sh
 4) brunch griffin
